@@ -1,5 +1,13 @@
 # API Regression
 
+## 新增：脱敏诊断与可运行服务
+
+执行报告新增 case_id、耗时、预期状态及本地复现提示；请求路径优先显示文档模板，无模板时遮蔽。Schema 诊断仅记录规则与路径深度，避免输出数据值及动态字段名。规范中的模板本身仍需审查；生成清单及 pytest 文件包含样例值，不能视为脱敏报告。
+
+可运行库存示例：`python examples/demo_service.py`。它是自建演示服务，不是生产项目，包含正确接口 `/items/2?q=demo` 和故意返回错误 id 类型的 `/broken?q=demo`。测试实际启动该服务，验证成功、回归检出、缺参数探索及敏感查询值不出现在报告中。
+
+[Schemathesis 后端评估](docs/SCHEMATHESIS.md)已记录接入条件，尚未实现适配器，不宣称已接入。
+
 [简体中文](README.md) | [English](README.en.md)
 
 从 OpenAPI 生成可审阅的 GET 接口测试清单，在明确授权的本地服务上执行状态码与 JSON 响应契约检查，并导出 pytest。
