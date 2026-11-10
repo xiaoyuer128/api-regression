@@ -1,5 +1,11 @@
 # API Regression
 
+## Redacted diagnostics and runnable service
+
+Execution reports now include case IDs, elapsed time, expected statuses and local reproduction guidance. Paths use spec templates or a redacted placeholder; schema failures contain rule names and path depths, not response values or dynamic keys. Review spec templates themselves. Plans and generated pytest retain sample values and are not redacted artifacts.
+
+Run `python examples/demo_service.py` for the inventory demo: `/items/2?q=demo` is valid; `/broken?q=demo` deliberately returns the wrong id type. This is a self-built demo, not a production project. Integration tests exercise it and check query-value redaction. See [optional Schemathesis assessment](docs/SCHEMATHESIS.md); no adapter has been implemented.
+
 [简体中文](README.md) | [English](README.en.md)
 
 Generate reviewable GET contract plans from OpenAPI, run explicitly approved local checks, and export pytest tests. Python 3.10+.
