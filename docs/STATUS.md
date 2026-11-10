@@ -1,5 +1,7 @@
 # Delivery status — 2026-11-10
 
+Extension checkpoint: redacted execution diagnostics, runnable inventory demo and optional-backend assessment added. Three rounds now run 11 test methods including demo integration. Schemathesis adapter remains unimplemented; no production or independent Agent validation claimed.
+
 - Scope, implementation, sample, bilingual documentation and CI configuration: complete for the documented subset.
 - Three local test rounds: 10 unittest methods per round passed, including actual exported pytest execution (1 passed, 1 exploratory skipped).
 - Skill frontmatter validation: passed.
