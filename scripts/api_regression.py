@@ -1,6 +1,7 @@
 """Generate a narrow OpenAPI status-contract plan; run only on explicit IPv4 loopback."""
 import argparse
 import json
+import time
 from pathlib import Path
 import urllib.request
 import urllib.error
@@ -98,10 +99,10 @@ def generate(spec):
             if reason:
                 skipped.append({'method':method.upper(),'path':path,'reason':reason})
             else:
-                cases.append({'method':'GET','path':actual_path,'query':query,'expected_statuses':statuses,'response_schemas':contracts,'expectation_source':'OpenAPI responses','kind':'contract'})
+                cases.append({'method':'GET','path':actual_path,'path_template':path,'query':query,'expected_statuses':statuses,'response_schemas':contracts,'expectation_source':'OpenAPI responses','kind':'contract'})
                 for (location,name),parameter in parameters.items():
                     if location=='query' and parameter.get('required'):
-                        cases.append({'method':'GET','path':actual_path,'query':{k:v for k,v in query.items() if k!=name},'expected_statuses':statuses,'response_schemas':contracts,'expectation_source':'Exploratory missing required query; exact error unspecified','kind':'exploratory'})
+                        cases.append({'method':'GET','path':actual_path,'path_template':path,'query':{k:v for k,v in query.items() if k!=name},'expected_statuses':statuses,'response_schemas':contracts,'expectation_source':'Exploratory missing required query; exact error unspecified','kind':'exploratory'})
     if len(cases)>100:
         raise ValueError('Maximum 100 executable cases')
     return {'version':1,'cases':cases,'skipped':skipped}
@@ -122,7 +123,9 @@ def execute(plan, base_url, approved=False, timeout=3):
         raise ValueError('Invalid timeout or case count')
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     results = []
-    for case in plan['cases']:
+    for index, case in enumerate(plan['cases'],1):
+        started=time.monotonic()
+        identity={'case_id':f'case-{index:03d}', 'method':'GET', 'path':case.get('path_template','[redacted path]'), 'expected_statuses':case['expected_statuses'], 'reproduce':'Regenerate from the local spec; run only this reviewed case with the same authorized base URL. Parameter values are intentionally omitted.'}
         if case['method']!='GET' or not case['path'].startswith('/') or case['path'].startswith('//'):
             raise ValueError('Unsupported executable case')
         try:
@@ -144,12 +147,12 @@ def execute(plan, base_url, approved=False, timeout=3):
                         else:
                             try:
                                 body=json.loads(raw.decode('utf-8'))
-                                errors.extend('Response schema mismatch at '+str(list(e.path)) for e in Draft4Validator(schema).iter_errors(body))
+                                errors.extend({'code':'schema_mismatch','validator':e.validator,'instance_depth':len(e.path),'schema_depth':len(e.schema_path)} for e in Draft4Validator(schema).iter_errors(body))
                             except (ValueError,UnicodeError): errors.append('Invalid JSON response')
             verdict = 'observed' if case.get('kind')=='exploratory' else 'passed' if status in case['expected_statuses'] and not errors else 'failed'
-            results.append({'path':case['path'],'status':status,'verdict':verdict,'errors':errors})
+            results.append({**identity,'status':status,'verdict':verdict,'errors':errors,'elapsed_ms':round((time.monotonic()-started)*1000,2)})
         except (OSError, ValueError) as exc:
-            results.append({'path':case['path'],'verdict':'error','error_type':type(exc).__name__})
+            results.append({**identity,'verdict':'error','error_type':type(exc).__name__,'elapsed_ms':round((time.monotonic()-started)*1000,2)})
     return {'results':results,'skipped':plan['skipped'],'summary':{v:sum(r['verdict']==v for r in results) for v in ('passed','failed','error','observed')},'scope':'GET status and supported JSON schema subset; exploratory outcomes are observations'}
 
 
