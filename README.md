@@ -59,3 +59,7 @@ passed 为契约通过，failed 为状态/响应不匹配，error 为请求失�
 [开发流程](docs/DEVELOPMENT.md)；[评测说明](evals/README.md)。当前已完成限定范围的本地实现，独立仓库为 https://github.com/xiaoyuer128/api-regression 。
 
 参考 [OpenAPI 3.0.3](https://spec.openapis.org/oas/v3.0.3) 的参数、响应和操作定义；同类候选 [api-tester](https://github.com/zeroclaw-labs/zeroclaw-skills/blob/master/skills/api-tester/SKILL.md) 尚未完成源码/Star 核验，不宣称评测优劣。
+
+## Release v0.1.0 / 发布版本
+
+MIT licensed. [Installation and complete demo / 安装与完整演示](docs/INSTALLATION.md). Run `python scripts/demo.py`. Platform indexing and Agent auto-activation are not certified by local checks.
