@@ -27,3 +27,7 @@ Exploratory requests are observed, never asserted to return an invented 400 stat
 Exit 0 means no executed failures, including generation-only or all-skipped runs; 1 failed/error; 2 input/configuration error. Inspect actual counts. Reports omit response bodies/query values but paths may contain identifiers.
 
 See [recorded test rounds](evals/results.json), [evaluation limitations](evals/README.md) and [development workflow](docs/DEVELOPMENT.md). Tests use temporary local HTTP services and execute generated pytest. No independent Agent benchmark, exhaustive hostile-input/resource analysis or production endpoint validation is claimed. Python's default JSON parser remains in use; extreme numbers and duplicate keys need future hardening. Intended for trusted local services. Repository: https://github.com/xiaoyuer128/api-regression .
+
+## Release v0.1.0 / 发布版本
+
+MIT licensed. [Installation and complete demo / 安装与完整演示](docs/INSTALLATION.md). Run `python scripts/demo.py`. Platform indexing and Agent auto-activation are not certified by local checks.
